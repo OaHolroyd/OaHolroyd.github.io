@@ -1,0 +1,45 @@
+body {
+  font-family: sans-serif;
+}
+
+/* Make content area fill the entire browser window */
+html,
+.fullscreen {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Center the content in the browser window */
+.container {
+  margin: auto;
+  text-align: center;
+  background-color: red;
+  width: 100%;
+}
+
+.title {
+  font-size: 3rem;
+}
+
+#board {
+  background-color: blue;
+  margin: auto;
+  text-align: center;
+  max-width: 500px;
+  aspect-ratio: 1.0;
+  position: relative;
+}
+
+.letter {
+  display: flex;
+  background-color: cyan;
+  opacity: 0.5;
+  position: absolute;
+  aspect-ratio: 1.0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
