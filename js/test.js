@@ -3,12 +3,25 @@
 var score = 0;
 var wordlist = [];
 
+var usesKey = false; // does the current guess use the key letter?
+var hasClicked = []; // which letters have been clicked
+var guess = []; // records the guess
+
 var keyword = '';
 var keyletter = '';
 var letters = [];
 
+// elements
+const board = document.getElementById('board');
+const guessBox = document.getElementById('guess');
+const submitButton = document.getElementById('submit');
+const scoreBox = document.getElementById('score');
+
+// set everything up
 setupGame(0);
 setupActions();
+
+
 
 // shuffle an array in place
 function shuffle(array) {
@@ -24,6 +37,10 @@ function setupGame(seed) {
   score = 0;
   wordlist = [];
 
+  usesKey = false;
+  hasClicked = [];
+  guess = [];
+
   // set up the game variables
   // TODO: use seed to randomly select the word and keyletter
   keyword = 'simpleton';
@@ -33,13 +50,14 @@ function setupGame(seed) {
   const N = letters.length;
 
   // draw everything
-  const board = document.getElementById('board');
   const tileSize = 20;
 
   // draw the main letter
   let letter = document.createElement('div');
   letter.classList.add('letter');
+  letter.classList.add('keyLetter');
   letter.innerHTML = keyletter;
+  letter.id = 0;
   let x = 50 - tileSize/2;
   let y = 50 - tileSize/2;
   letter.style.width = tileSize+'%';
@@ -47,12 +65,15 @@ function setupGame(seed) {
   letter.style.top = y+'%';
   board.appendChild(letter);
 
+  hasClicked.push(false);
+
   // draw the remaining letters
   for (var i = 1; i < N; i++) {
     // create a letter div for each one
     let letter = document.createElement('div');
     letter.classList.add('letter');
     letter.innerHTML = letters[i];
+    letter.id = i;
 
     // work out the position
     let theta = (i-1) * 2.0 * Math.PI / (N-1);
@@ -64,8 +85,10 @@ function setupGame(seed) {
 
     board.appendChild(letter);
 
+    hasClicked.push(false);
   }
-  document.getElementById('score').innerHTML = score;
+
+  scoreBox.innerHTML = score;
 }
 
 // what do do if a key tap is detected
@@ -92,7 +115,60 @@ function keyTapped(event) {
 
 // what to do if the game is clicked/tapped
 function tapDown(event) {
-  console.log('clicked');
+  let target = event.target;
+  let isLetter = target.classList.contains('letter');
+
+  if (isLetter) {
+    let id = target.id;
+    let isKeyLetter = target.classList.contains('keyLetter');
+    let letter = target.innerHTML;
+
+    if (isKeyLetter) {
+      usesKey = true;
+    }
+
+    // add letter if it hasn't been used already
+    if (!hasClicked[id]) {
+      hasClicked[id] = true;
+      guess.push(letter);
+
+      // update the guess
+      guessBox.innerHTML = guess.join('');
+    }
+    console.log(guess + usesKey);
+  }
+}
+
+// resets the guess
+function resetGuess() {
+  usesKey = false;
+  guess = [];
+  for(var i = 0; i < keyword.length; i++){
+    hasClicked[i] = false;
+  }
+}
+
+// submit a guess
+function tapSubmit() {
+  let len = guess.length;
+  let word = guess.join('');
+
+  // no letters must be wrong
+  if (len < 1 || !usesKey) {
+    guessBox.innerHTML = "INCORRECT";
+    resetGuess();
+    return;
+  }
+
+  // TODO: check that the guess is actually a word
+  if (true) {
+    wordlist.push(word);
+    score = score + 1;
+    scoreBox.innerHTML = score;
+    guessBox.innerHTML = "CORRECT";
+  }
+
+  resetGuess();
 }
 
 
@@ -101,6 +177,7 @@ function setupActions() {
   // TODO: be different depending on computer vs touchscreen
   document.addEventListener('keydown', keyTapped);
   document.addEventListener('click', tapDown);
+  submitButton.onclick = tapSubmit;
 }
 
 
