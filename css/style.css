@@ -69,14 +69,6 @@ html,
   position: relative;
 }
 
-.selected {
-  background-color: blue;
-}
-
-.unselected {
-  background-color: cyan;
-}
-
 .letter {
   display: flex;
   position: absolute;
@@ -87,5 +79,13 @@ html,
 }
 
 .keyLetter {
+/*  background-color: blue;*/
+}
+
+.selected {
   background-color: blue;
+}
+
+.unselected {
+  background-color: cyan;
 }

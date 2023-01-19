@@ -6,6 +6,7 @@ var wordlist = [];
 var usesKey = false; // does the current guess use the key letter?
 var hasClicked = []; // which letters have been clicked
 var guess = []; // records the guess
+var guessId = []; // records the guess ids
 
 var keyword = '';
 var keyletter = '';
@@ -15,6 +16,7 @@ var letters = [];
 const board = document.getElementById('board');
 const guessBox = document.getElementById('guess');
 const submitButton = document.getElementById('submit');
+const backButton = document.getElementById('back');
 const scoreBox = document.getElementById('score');
 
 // set everything up
@@ -36,10 +38,6 @@ function setupGame(seed) {
   // reset the players progress
   score = 0;
   wordlist = [];
-
-  usesKey = false;
-  hasClicked = [];
-  guess = [];
 
   // set up the game variables
   // TODO: use seed to randomly select the word and keyletter
@@ -89,6 +87,7 @@ function setupGame(seed) {
   }
 
   scoreBox.innerHTML = score;
+  resetGuess();
 }
 
 // what do do if a key tap is detected
@@ -110,6 +109,10 @@ function keyTapped(event) {
     // forward delete: 46
     // enter: 13
     // arrow keys [UDLR]: 97, 40, 37, 39
+
+    if (keyCode == 8) {
+      backspace();
+    }
   }
 }
 
@@ -131,21 +134,52 @@ function tapDown(event) {
     if (!hasClicked[id]) {
       hasClicked[id] = true;
       guess.push(letter);
-
-      // update the guess
-      guessBox.innerHTML = guess.join('');
+      guessId.push(id);
     }
-    console.log(guess + usesKey);
+
+    updateSelection();
   }
+}
+
+// removes the last letter
+function backspace() {
+  // do nothing if the guess is empty
+  if (guess.length == 0) {
+    return;
+  }
+
+  // remove the last letter
+  let id = guessId.pop();
+  guess.pop();
+  hasClicked[id] = false;
+
+  updateSelection();
+}
+
+// updates the button colors
+function updateSelection() {
+  for (var i = 0; i < keyword.length; i++) {
+    if (hasClicked[i]) {
+      document.getElementById(i).classList.remove('unselected');
+      document.getElementById(i).classList.add('selected');
+    } else {
+      document.getElementById(i).classList.remove('selected');
+      document.getElementById(i).classList.add('unselected');
+    }
+  }
+
+  guessBox.innerHTML = guess.join('');
 }
 
 // resets the guess
 function resetGuess() {
   usesKey = false;
   guess = [];
+  guessId = [];
   for(var i = 0; i < keyword.length; i++){
     hasClicked[i] = false;
   }
+  updateSelection();
 }
 
 // submit a guess
@@ -154,7 +188,7 @@ function tapSubmit() {
   let word = guess.join('');
 
   // no letters must be wrong
-  if (len < 1 || !usesKey) {
+  if (!usesKey) {
     guessBox.innerHTML = "INCORRECT";
     resetGuess();
     return;
@@ -178,6 +212,7 @@ function setupActions() {
   document.addEventListener('keydown', keyTapped);
   document.addEventListener('click', tapDown);
   submitButton.onclick = tapSubmit;
+  backButton.onclick = backspace;
 }
 
 
