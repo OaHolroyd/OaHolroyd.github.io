@@ -122,6 +122,31 @@ function setupGame() {
 
   scoreBox.innerHTML = score;
   resetGuess();
+  updateColorScheme();
+}
+
+// update color scheme
+function updateColorScheme() {
+  // TODO: use color codes for the colors
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    // dark mode
+    document.documentElement.style.setProperty('--color-back', 'black');
+    document.documentElement.style.setProperty('--color-fore', 'white');
+    document.documentElement.style.setProperty('--color-min', 'darkgrey');
+    document.documentElement.style.setProperty('--color-mid', 'grey');
+    document.documentElement.style.setProperty('--color-max', 'lightgrey');
+    document.documentElement.style.setProperty('--color-tintgood', 'lightgreen');
+    document.documentElement.style.setProperty('--color-tintbad', 'lightred');
+  } else {
+    // light mode
+    document.documentElement.style.setProperty('--color-back', 'white');
+    document.documentElement.style.setProperty('--color-fore', 'black');
+    document.documentElement.style.setProperty('--color-min', 'lightgrey');
+    document.documentElement.style.setProperty('--color-mid', 'grey');
+    document.documentElement.style.setProperty('--color-max', 'darkgrey');
+    document.documentElement.style.setProperty('--color-tintgood', 'darkgreen');
+    document.documentElement.style.setProperty('--color-tintbad', 'darkred');
+  }
 }
 
 // what do do if a key tap is detected
@@ -204,11 +229,7 @@ function updateSelection() {
     }
   }
 
-  if (["INCORRECT", "CORRECT", "REPEAR"].includes(guessBox.innerHTML)) {
-    guessBox.innerHTML = guessBox.innerHTML + '\u200b';
-  } else {
-    guessBox.innerHTML = guess.join('');
-  }
+  guessBox.innerHTML = guess.join('');
 }
 
 // resets the guess
@@ -233,6 +254,21 @@ function resetGuess() {
   updateSelection();
 }
 
+// flash good, rep, bad status for a guess
+function flashStatus(status) {
+  let anim = 'anim-' + status + ' 0.5s linear 1';
+  for (var i in hasClicked) {
+    if (hasClicked[i]) {
+      document.getElementById(i).style.animation = anim;
+    }
+  }
+  setTimeout(function () {
+    for (var i in hasClicked) {
+      document.getElementById(i).style.animation = null;
+    }
+  }, 500);
+}
+
 // submit a guess
 function tapSubmit() {
   let len = guess.length;
@@ -240,7 +276,7 @@ function tapSubmit() {
 
   // no letters must be wrong
   if (!usesKey) {
-    guessBox.innerHTML = "INCORRECT";
+    flashStatus('bad');
     resetGuess();
     return;
   }
@@ -248,22 +284,20 @@ function tapSubmit() {
   // has it been guessed already?
   for(var i = 0, length1 = wordList.length; i < length1; i++){
     if (word === wordList[i]) {
-      guessBox.innerHTML = "REPEAT";
+      flashStatus('rep');
       resetGuess();
       return;
     }
   }
-
-  console.log(inTrie(word));
 
   // check that the guess is actually a word with 3 or more letters
   if (isValid(word, 3)) {
     wordList.push(word);
     score = score + 1;
     scoreBox.innerHTML = score;
-    guessBox.innerHTML = "CORRECT";
+    flashStatus('good');
   } else {
-    guessBox.innerHTML = "INCORRECT";
+    flashStatus('bad');
   }
 
   resetGuess();
@@ -276,4 +310,5 @@ function setupActions() {
   document.addEventListener('click', tapDown);
   submitButton.onclick = tapSubmit;
   backButton.onclick = backspace;
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
 }
