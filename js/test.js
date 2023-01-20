@@ -11,9 +11,12 @@ var guessId = []; // records the guess ids
 var keyword = '';
 var keyletter = '';
 var letters = [];
+var totalWords = [];
+var aim = [10, 100, 1000];
 
 // elements
 const board = document.getElementById('board');
+const aimBox = document.getElementById('aim');
 const guessBox = document.getElementById('guess');
 const submitButton = document.getElementById('submit');
 const backButton = document.getElementById('back');
@@ -70,6 +73,12 @@ function setupGame() {
   shuffle(letters, seed);
   keyletter = letters[0];
   const N = letters.length;
+
+  // get total words
+  totalWords = subwords(letters, maxTrie, 0);
+  aim[0] = Math.floor(0.1*totalWords.length);
+  aim[1] = Math.floor(0.15*totalWords.length);
+  aim[2] = Math.floor(0.2*totalWords.length);
 
   // draw everything
   const tileSize = 20;
@@ -209,6 +218,15 @@ function resetGuess() {
   for(var i = 0; i < keyword.length; i++){
     hasClicked[i] = false;
   }
+
+  if (score < aim[0]) {
+    aimBox.innerHTML = "average: " + aim[0];
+  } else if (score < aim[1]) {
+    aimBox.innerHTML = "good: " + aim[1];
+  } else {
+    aimBox.innerHTML = "excellent: " + aim[2];
+  }
+
   updateSelection();
 }
 
@@ -233,6 +251,8 @@ function tapSubmit() {
     }
   }
 
+  console.log(inTrie(word));
+
   // check that the guess is actually a word with 3 or more letters
   if (isValid(word, 3)) {
     wordList.push(word);
@@ -246,7 +266,6 @@ function tapSubmit() {
   resetGuess();
 }
 
-
 // set up interactions with the game internals
 function setupActions() {
   // TODO: be different depending on computer vs touchscreen
@@ -255,30 +274,3 @@ function setupActions() {
   submitButton.onclick = tapSubmit;
   backButton.onclick = backspace;
 }
-
-
-
-// // This is javascript array of objects, each object has 1 property - buttonText.
-// // You can add more properties.
-// const elements = [
-//     { buttonText: 'Button 1' },
-//     { buttonText: 'Button 2' },
-//     { buttonText: 'Button 3' }
-// ];
-// // Get parent div in which you want to add buttons
-// const parent = document.getElementById('buttons-container');
-
-// var count = 0
-
-// // In for loop, set 'i' to be lower than number length of array.
-// for(let i = 0; i < elements.length; i++) {
-//     // Create button node and add innerHTML (innerHTML is stuff that goes between <></> tags).
-//     // Since 'elements' is an array, you select current iteration of it with [i]
-//     let button = document.createElement('button');
-//     button.innerHTML = elements[i].buttonText;
-//     button.onclick = function () {
-//                          count += i;
-//                          document.getElementById('count').innerHTML = count
-//                      };
-//     parent.appendChild(button);
-// }
