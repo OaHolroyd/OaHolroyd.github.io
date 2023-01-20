@@ -24,6 +24,7 @@ body {
 /* Make content area fill the entire browser window */
 html,
 .fullscreen {
+  background-color: var(--color-back);
   display: flex;
   height: 100%;
   margin: 0;
@@ -35,13 +36,21 @@ html,
 .container {
   margin: auto;
   text-align: center;
-  background-color: var(--color-back);
   width: 100%;
 }
 
 .title {
   color: var(--color-fore);
   font-size: 3rem;
+}
+
+#aim {
+  background-color: var(--color-back);
+  color: var(--color-fore);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 #controls {
