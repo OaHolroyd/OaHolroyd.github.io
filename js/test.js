@@ -20,31 +20,54 @@ const backButton = document.getElementById('back');
 const scoreBox = document.getElementById('score');
 
 // set everything up
-setupGame(0);
+setupGame();
 setupActions();
 
 
+// returns the day seed (just days since epoch)
+function daySeed() {
+  var now = new Date();
+  var day = Math.floor(now/8.64e7);
+  return day;
+}
 
-// shuffle an array in place
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
+// shuffles an array using a seed
+function shuffle(array, seed) {
+  var m = array.length, t, i;
+
+  // While there remain elements to shuffle…
+  while (m) {
+
+    // Pick a remaining element…
+    i = Math.floor(random(seed) * m--);
+
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+    ++seed;
+  }
+
+  return array;
+}
+
+// returns a (bad) seeded random number
+function random(seed) {
+  var x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
 }
 
 // set up the game
-function setupGame(seed) {
+function setupGame() {
   // reset the players progress
   score = 0;
   wordList = [];
 
   // set up the game variables
-  // TODO: use seed to randomly select the word and keyletter
-  // keyword = 'simpleton';
-  keyword = en_gb_8[Math.floor(Math.random() * en_gb_8.length)]
+  let seed = daySeed();
+  keyword = en_gb_9[seed % en_gb_9.length];
   letters = keyword.toUpperCase().split('');
-  shuffle(letters);
+  shuffle(letters, seed);
   keyletter = letters[0];
   const N = letters.length;
 
@@ -210,8 +233,8 @@ function tapSubmit() {
     }
   }
 
-  // TODO: check that the guess is actually a word
-  if (isValid(word)) {
+  // check that the guess is actually a word with 3 or more letters
+  if (isValid(word, 3)) {
     wordList.push(word);
     score = score + 1;
     scoreBox.innerHTML = score;
