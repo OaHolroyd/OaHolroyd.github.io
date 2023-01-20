@@ -1,6 +1,14 @@
 :root {
+  /* sizes */
   --board-width: 500px;
   --pad: 10px;
+
+  /* colors */
+  --color-back: white;
+  --color-fore: black;
+  --color-min: lightgrey;
+  --color-mid: grey;
+  --color-max: darkgrey;
 }
 
 body {
@@ -21,7 +29,7 @@ html,
 .container {
   margin: auto;
   text-align: center;
-  background-color: red;
+  background-color: var(--color-back);
   width: 100%;
 }
 
@@ -31,14 +39,15 @@ html,
 
 #controls {
   margin: auto;
-  background-color: #2E4272;
+  background-color: var(--color-back);
   max-width: calc(var(--board-width) - 2*var(--pad));
+  height: 30px;
   display: flex;
   padding: var(--pad);
 }
 
 #score {
-  background-color: #4F628E;
+  background-color: var(--color-back);
   width: 50px;
   display: flex;
   flex-direction: column;
@@ -47,12 +56,27 @@ html,
 }
 
 #submit {
-/*  background-color: #4F628E;*/
+  border: 1px solid var(--color-fore);
+  background-color: lightgreen;
   width: 50px;
 }
 
+#submit:active {
+  background-color: green;
+}
+
+#back {
+  border: 1px solid var(--color-fore);
+  background-color: red;
+  width: 50px;
+}
+
+#back:active {
+  background-color: darkred;
+}
+
 #guess {
-  background-color: #7887AB;
+  background-color: var(--color-back);
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -61,7 +85,7 @@ html,
 }
 
 #board {
-  background-color: yellow;
+/*  background-color: yellow;*/
   margin: auto;
   text-align: center;
   max-width: var(--board-width);
@@ -76,6 +100,8 @@ html,
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border-radius: 500%;
+  border: 2px solid var(--color-fore);
 }
 
 .keyLetter {
@@ -83,9 +109,9 @@ html,
 }
 
 .selected {
-  background-color: blue;
+  background-color: var(--color-mid);
 }
 
 .unselected {
-  background-color: cyan;
+  background-color: var(--color-min);
 }

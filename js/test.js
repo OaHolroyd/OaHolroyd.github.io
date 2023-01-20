@@ -12,7 +12,7 @@ var keyword = '';
 var keyletter = '';
 var letters = [];
 var totalWords = [];
-var aim = [10, 100, 1000];
+var aim = [10, 100, 1000, 10000];
 
 // elements
 const board = document.getElementById('board');
@@ -79,6 +79,7 @@ function setupGame() {
   aim[0] = Math.floor(0.1*totalWords.length);
   aim[1] = Math.floor(0.15*totalWords.length);
   aim[2] = Math.floor(0.2*totalWords.length);
+  aim[3] = totalWords.length;
 
   // draw everything
   const tileSize = 20;
@@ -223,8 +224,10 @@ function resetGuess() {
     aimBox.innerHTML = "average: " + aim[0];
   } else if (score < aim[1]) {
     aimBox.innerHTML = "good: " + aim[1];
-  } else {
+  } else if (score < aim[2]) {
     aimBox.innerHTML = "excellent: " + aim[2];
+  } else {
+    aimBox.innerHTML = "total: " + aim[3];
   }
 
   updateSelection();
