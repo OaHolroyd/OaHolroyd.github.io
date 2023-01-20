@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 
 var score = 0;
-var wordlist = [];
+var wordList = [];
 
 var usesKey = false; // does the current guess use the key letter?
 var hasClicked = []; // which letters have been clicked
@@ -37,11 +37,12 @@ function shuffle(array) {
 function setupGame(seed) {
   // reset the players progress
   score = 0;
-  wordlist = [];
+  wordList = [];
 
   // set up the game variables
   // TODO: use seed to randomly select the word and keyletter
-  keyword = 'simpleton';
+  // keyword = 'simpleton';
+  keyword = en_gb_8[Math.floor(Math.random() * en_gb_8.length)]
   letters = keyword.toUpperCase().split('');
   shuffle(letters);
   keyletter = letters[0];
@@ -98,13 +99,13 @@ function keyTapped(event) {
   console.log(key + ' ' + '(' + keyCode + ') was pressed');
 
   if (event.keyCode >= 48 && event.keyCode <= 57) {
-    // number
+    // NUMBER
   } else if (event.keyCode >= 65 && event.keyCode <= 90) {
-    // alphabet upper case
+    // ALPHABET UPPER CASE
   } else if (event.keyCode >= 97 && event.keyCode <= 122) {
-    // alphabet lower case
+    // ALPHABET LOWER CASE
   } else {
-    // control key
+    // CONTROL KEYS
     // delete: 8
     // forward delete: 46
     // enter: 13
@@ -112,6 +113,8 @@ function keyTapped(event) {
 
     if (keyCode == 8) {
       backspace();
+    } else if (keyCode == 13) {
+      tapSubmit();
     }
   }
 }
@@ -168,7 +171,11 @@ function updateSelection() {
     }
   }
 
-  guessBox.innerHTML = guess.join('');
+  if (["INCORRECT", "CORRECT", "REPEAR"].includes(guessBox.innerHTML)) {
+    guessBox.innerHTML = guessBox.innerHTML + '\u200b';
+  } else {
+    guessBox.innerHTML = guess.join('');
+  }
 }
 
 // resets the guess
@@ -194,12 +201,23 @@ function tapSubmit() {
     return;
   }
 
+  // has it been guessed already?
+  for(var i = 0, length1 = wordList.length; i < length1; i++){
+    if (word === wordList[i]) {
+      guessBox.innerHTML = "REPEAT";
+      resetGuess();
+      return;
+    }
+  }
+
   // TODO: check that the guess is actually a word
-  if (true) {
-    wordlist.push(word);
+  if (isValid(word)) {
+    wordList.push(word);
     score = score + 1;
     scoreBox.innerHTML = score;
     guessBox.innerHTML = "CORRECT";
+  } else {
+    guessBox.innerHTML = "INCORRECT";
   }
 
   resetGuess();
