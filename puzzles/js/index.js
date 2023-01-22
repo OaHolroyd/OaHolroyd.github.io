@@ -64,7 +64,7 @@ function setUpLinks() {
     let img = document.createElement('img');
     img.src = 'images/' + fileName + '.png'; // TODO: what if this doesn't exist?
     img.alt = fileName;
-    img.onerror = "this.onerror=null;this.src='images/puzzles-512.png';"
+    img.onerror = "this.onerror=null;this.src='images/puzzles-512.png';";
     // TODO: also set width and height?
 
     let desc = document.createElement('div');
