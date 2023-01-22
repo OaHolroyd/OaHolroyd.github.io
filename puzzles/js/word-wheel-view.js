@@ -276,19 +276,49 @@ function fetchData(seed) {
       // been upgraded from a previous version
       db = event.target.result;
 
-      // create object store to store wordWheel data
-      var store = db.createObjectStore('wordWheel', {keyPath: 'keyWord'});
+      // create object store if required
+      if (event.oldVersion < 1000) {
+        // create object store to store wordWheel data
+        var store = db.createObjectStore('wordWheel', {keyPath: 'keyWord'});
 
-      // create index to search by keyWord
-      // TODO: is this required?
-      store.createIndex('keyWord', 'keyWord', { unique: false }); // TODO: or true?
+        // create index to search by keyWord
+        // TODO: is this required?
+        store.createIndex('keyWord', 'keyWord', { unique: false }); // TODO: or true?
 
-      // add data once objectStore creation is finished
-      store.transaction.oncomplete = (event) => {
-        // store values in the newly created objectStore
-        const wordWheelObjectStore = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
-        wordWheelObjectStore.add(wordWheel);
-      };
+        // add data once objectStore creation is finished
+        store.transaction.oncomplete = (event) => {
+          // store values in the newly created objectStore
+          const wordWheelObjectStore = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
+          wordWheelObjectStore.add(wordWheel);
+        };
+      } else {
+        // overwrite data from wordWheel to save progress
+        // read the data from the database
+        var store = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
+        var req = store.get(wordWheel.keyWord);
+
+        req.onerror = (event) => {
+          // if it doesn't exist just write
+          const requestUpdate = store.put(wordWheel);
+          requestUpdate.onerror = (event) => {
+            console.error(`Database error [write]: ${event.target.errorCode}`);
+          };
+          requestUpdate.onsuccess = (event) => {
+            // data has been successfully updated
+          };
+        };
+
+        req.onsuccess = (event) => {
+          // overwrite wordWheel
+          const requestUpdate = store.put(wordWheel);
+          requestUpdate.onerror = (event) => {
+            console.error(`Database error [write]: ${event.target.errorCode}`);
+          };
+          requestUpdate.onsuccess = (event) => {
+            // data has been successfully updated
+          };
+        };
+      }
     };
   } else {
     console.log('[fetch] IndexedDB is not supported');
