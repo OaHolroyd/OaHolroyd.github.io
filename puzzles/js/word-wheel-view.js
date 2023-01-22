@@ -13,10 +13,11 @@ const submitButton = document.getElementById('submit');
 const backButton = document.getElementById('back');
 const scoreBox = document.getElementById('score');
 const listBox = document.getElementById('list');
+var letterBox = [];
 
+setUpView();
 fetchData(Random.seed());
 updateColorScheme();
-setUpView();
 setUpActions();
 
 /* ========================================================================== */
@@ -38,6 +39,7 @@ function setUpView() {
   letter.style.left = x+'%';
   letter.style.top = y+'%';
   board.appendChild(letter);
+  letterBox.push(letter);
   hasClicked.push(false);
 
   // draw the remaining letters
@@ -57,7 +59,7 @@ function setUpView() {
     letter.style.top = y+'%';
 
     board.appendChild(letter);
-
+    letterBox.push(letter);
     hasClicked.push(false);
   }
 
@@ -94,11 +96,11 @@ function updateColorScheme() {
 function updateSelection() {
   for (var i = 0; i < wordWheel.keyWord.length; i++) {
     if (hasClicked[i]) {
-      document.getElementById(i).classList.remove('unselected');
-      document.getElementById(i).classList.add('selected');
+      letterBox[i].classList.remove('unselected');
+      letterBox[i].classList.add('selected');
     } else {
-      document.getElementById(i).classList.remove('selected');
-      document.getElementById(i).classList.add('unselected');
+      letterBox[i].classList.remove('selected');
+      letterBox[i].classList.add('unselected');
     }
   }
 
@@ -235,7 +237,7 @@ function setUpActions() {
 // fetch indexed data
 function fetchData(seed) {
   // check if IndexedDB is supported
-  if(window.indexedDB){
+  if (window.indexedDB) {
     var request = window.indexedDB.open('WORD_WHEEL_DB', seed);
     var db;
 
@@ -268,6 +270,13 @@ function fetchData(seed) {
         wordWheel.aim = res.aim;
         wordWheel.guessList = res.guessList;
         wordWheel.keyWordGuessed = res.keyWordGuessed;
+
+        for (var i in wordWheel.guessList) {
+          let item = document.createElement('li');
+          item.innerHTML = wordWheel.guessList[i];
+          listBox.appendChild(item);
+        }
+        resetGuess();
       };
     };
 
