@@ -44,109 +44,51 @@ html,
   font-size: 3rem;
 }
 
-#aim {
-  background-color: var(--color-back);
-  color: var(--color-fore);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+
+/* bunch of styles for displaying gallery of puzzles */
+div.gallery {
+  border: 1px solid #ccc;
 }
 
-#controls {
-  margin: auto;
-  background-color: var(--color-back);
-  max-width: calc(var(--board-width) - 2*var(--pad));
-  height: 30px;
-  display: flex;
-  padding: var(--pad);
+div.gallery:hover {
+  border: 1px solid #777;
 }
 
-#score {
-  background-color: var(--color-back);
-  color: var(--color-fore);
-  width: 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+div.gallery img {
+  width: 100%;
+  height: auto;
 }
 
-#submit {
-  border: 1px solid var(--color-fore);
-  color: var(--color-fore);
-  background-color: lightgreen;
-  width: 50px;
-}
-
-#submit:active {
-  background-color: green;
-}
-
-#back {
-  border: 1px solid var(--color-fore);
-  color: var(--color-fore);
-  background-color: red;
-  width: 50px;
-}
-
-#back:active {
-  background-color: darkred;
-}
-
-#guess {
-  background-color: var(--color-back);
-  color: var(--color-fore);
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-#board {
-  margin: auto;
+div.desc {
+  padding: 15px;
   text-align: center;
-  max-width: var(--board-width);
-  aspect-ratio: 1.0;
-  position: relative;
 }
 
-.letter {
-  display: flex;
-  position: absolute;
-  aspect-ratio: 1.0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 500%;
-  border: 2px solid var(--color-fore);
-  color: var(--color-fore);
+* {
+  box-sizing: border-box;
 }
 
-.keyLetter {
-/*  background-color: blue;*/
+.responsive {
+  padding: 0 6px;
+  float: left;
+  width: 24.99999%;
 }
 
-.selected {
-  background-color: var(--color-mid);
+@media only screen and (max-width: 500px) {
+  .responsive {
+    width: 49.99999%;
+    margin: 6px 0;
+  }
 }
 
-.unselected {
-  background-color: var(--color-back);
+@media only screen and (max-width: 300px) {
+  .responsive {
+    width: 100%;
+  }
 }
 
-@keyframes anim-bad {
-  100% { background-color: var(--color-back); }
-  0% { background-color: var(--color-bad); }
-}
-
-@keyframes anim-rep {
-  100% { background-color: var(--color-back); }
-  0% { background-color: var(--color-rep); }
-}
-
-@keyframes anim-good {
-  100% { background-color: var(--color-back); }
-  0% { background-color: var(--color-good); }
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
 }

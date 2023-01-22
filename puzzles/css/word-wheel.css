@@ -109,7 +109,6 @@ html,
 }
 
 ul {
-/*  background-color: red;*/
   color: var(--color-fore);
   font-size: 0.75em;
   margin: auto;

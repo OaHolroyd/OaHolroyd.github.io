@@ -1,7 +1,12 @@
 /* jshint esversion: 6 */
 
+const puzzles = [
+  'Word Wheel',
+];
+
 updateColorScheme();
 setUpActions();
+setUpLinks();
 
 /* ========================================================================== */
 /*   FUNCTIONS                                                                */
@@ -31,7 +36,75 @@ function updateColorScheme() {
     document.documentElement.style.setProperty('--color-tintbad', 'darkred');
   }
 }
+
 // set up interactions with the game internals
 function setUpActions() {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
+}
+
+// fill the list with all of the available puzzles
+function setUpLinks() {
+  let puzzleList = document.getElementById('puzzleList');
+
+  for (puzzle of puzzles) {
+    // get names
+    let displayName = puzzle;
+    let fileName = puzzle.replace(/ /g, "-").toLowerCase();
+
+    // create elements
+    let box = document.createElement('div');
+    box.classList.add('responsive');
+
+    let link = document.createElement('a');
+    link.href = fileName + '.html';
+
+    let imgBox = document.createElement('div');
+    imgBox.classList.add('gallery');
+
+    let img = document.createElement('img');
+    img.src = 'images/' + fileName + '.png'; // TODO: what if this doesn't exist?
+    img.alt = fileName;
+    img.onerror = "this.onerror=null;this.src='images/puzzles-512.png';"
+    // TODO: also set width and height?
+
+    let desc = document.createElement('div');
+    desc.classList.add('desc');
+    desc.innerHTML = displayName;
+
+    // assemble
+    imgBox.appendChild(img);
+    imgBox.appendChild(desc);
+    link.appendChild(imgBox);
+    box.appendChild(link);
+    puzzleList.appendChild(box);
+  }
+
+  // final "coming soon" box
+  let displayName = 'coming soon';
+  let fileName = 'puzzles-512';
+
+  let box = document.createElement('div');
+  box.classList.add('responsive');
+  let link = document.createElement('a');
+  link.href = fileName + '.html';
+  let imgBox = document.createElement('div');
+  imgBox.classList.add('gallery');
+  let img = document.createElement('img');
+  img.src = 'images/' + fileName + '.png'; // TODO: what if this doesn't exist?
+  img.alt = fileName;
+  // TODO: also set width and height?
+  let desc = document.createElement('div');
+  desc.classList.add('desc');
+  desc.innerHTML = displayName;
+
+  imgBox.appendChild(img);
+  imgBox.appendChild(desc);
+  link.appendChild(imgBox);
+  box.appendChild(link);
+  puzzleList.appendChild(box);
+
+  // finish list
+  let end = document.createElement('div');
+  end.classList.add('clearfix');
+  puzzleList.appendChild(box);
 }

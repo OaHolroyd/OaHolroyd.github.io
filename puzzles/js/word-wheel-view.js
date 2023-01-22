@@ -243,12 +243,10 @@ function fetchData(seed) {
 
     request.onerror = function(event) {
       // this is called if the database cannot be found
-      console.error(`Database error: ${event.target.errorCode}`);
     };
 
     request.onsuccess = function(event) {
       // this is called if the database with the correct version is opened
-      console.log('[onsuccess]', request.result);
       db = event.target.result; // save database in db variable
 
       // read the data from the database
@@ -330,7 +328,7 @@ function fetchData(seed) {
       }
     };
   } else {
-    console.log('[fetch] IndexedDB is not supported');
+    console.error('[fetch] IndexedDB is not supported');
   }
 }
 
@@ -399,6 +397,6 @@ function saveData(seed) {
       };
     };
   } else {
-    console.log('[fetch] IndexedDB is not supported');
+    console.error('[fetch] IndexedDB is not supported');
   }
 }
