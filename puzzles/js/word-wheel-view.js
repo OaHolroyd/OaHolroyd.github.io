@@ -14,6 +14,7 @@ const backButton = document.getElementById('back');
 const scoreBox = document.getElementById('score');
 const listBox = document.getElementById('list');
 
+fetchData();
 updateColorScheme();
 setUpView();
 setUpActions();
@@ -214,6 +215,7 @@ function tapSubmit() {
     let item = document.createElement('li');
     item.innerHTML = word;
     listBox.appendChild(item);
+    saveData();
   }
 
   resetGuess();
@@ -227,4 +229,128 @@ function setUpActions() {
   submitButton.onclick = tapSubmit;
   backButton.onclick = backspace;
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
+}
+
+// fetch indexed data
+function fetchData(seed) {
+  // check if IndexedDB is supported
+  if(window.indexedDB){
+    var request = window.indexedDB.open('WORD_WHEEL_DB', seed);
+    var db;
+
+    request.onerror = function(event) {
+      // this is called if the database cannot be found
+      console.error(`Database error: ${event.target.errorCode}`);
+    };
+
+    request.onsuccess = function(event) {
+      // this is called if the database with the correct version is opened
+      console.log('[onsuccess]', request.result);
+      db = event.target.result; // save database in db variable
+
+      // read the data from the database
+      var store = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
+      var req = store.get(wordWheel.keyWord);
+
+      req.onerror = (event) => {
+        // do nothing if it doesn't exist
+      };
+
+      req.onsuccess = (event) => {
+        // overwrite wordWheel
+        wordWheel = event.target.result; // TODO: check this works
+      };
+    };
+
+    request.onupgradeneeded = function(event) {
+      // this is called if the database has either just been created, or has
+      // been upgraded from a previous version
+      db = event.target.result;
+
+      // create object store to store wordWheel data
+      var store = db.createObjectStore('wordWheel', {keyPath: 'keyWord'});
+
+      // create index to search by keyWord
+      // TODO: is this required?
+      store.createIndex('keyWord', 'keyWord', { unique: false }); // TODO: or true?
+
+      // add data once objectStore creation is finished
+      store.transaction.oncomplete = (event) => {
+        // store values in the newly created objectStore
+        const wordWheelObjectStore = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
+        wordWheelObjectStore.add(wordWheel);
+      };
+    };
+  } else {
+    console.log('[fetch] IndexedDB is not supported');
+  }
+}
+
+// fetch indexed data
+function saveData() {
+  // check if IndexedDB is supported
+  if(window.indexedDB){
+    var request = window.indexedDB.open('WORD_WHEEL_DB', seed);
+    var db;
+
+    request.onerror = function(event) {
+      // this is called if the database cannot be found
+      console.error(`Database error [open]: ${event.target.errorCode}`);
+    };
+
+    request.onsuccess = function(event) {
+      // this is called if the database with the correct version is opened
+      console.log('[onsuccess]', request.result);
+      db = event.target.result; // save database in db variable
+
+      // overwrite data from wordWheel to save progress
+      // read the data from the database
+      var store = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
+      var req = store.get(wordWheel.keyWord);
+
+      req.onerror = (event) => {
+        // if it doesn't exist just write
+        const requestUpdate = store.put(data);
+        requestUpdate.onerror = (event) => {
+          console.error(`Database error [write]: ${event.target.errorCode}`);
+        };
+        requestUpdate.onsuccess = (event) => {
+          // data has been successfully updated
+        };
+      };
+
+      req.onsuccess = (event) => {
+        // overwrite wordWheel
+        const requestUpdate = store.put(data);
+        requestUpdate.onerror = (event) => {
+          console.error(`Database error [write]: ${event.target.errorCode}`);
+        };
+        requestUpdate.onsuccess = (event) => {
+          // data has been successfully updated
+        };
+      };
+    };
+
+    request.onupgradeneeded = function(event) {
+      // this is called if the database has either just been created, or has
+      // been upgraded from a previous version
+      db = event.target.result;
+
+      // create object store to store wordWheel data
+      var store = db.createObjectStore('wordWheel', {keyPath: 'keyWord'});
+
+      // create index to search by keyWord
+      // TODO: is this required?
+      store.createIndex('keyWord', 'keyWord', { unique: false }); // TODO: or true?
+
+      // add data once objectStore creation is finished
+      store.transaction.oncomplete = (event) => {
+        // store values in the newly created objectStore
+        const wordWheelObjectStore = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
+        wordWheelObjectStore.add(wordWheel);
+      };
+    };
+  } else {
+    console.log('[fetch] IndexedDB is not supported');
+  }
 }
