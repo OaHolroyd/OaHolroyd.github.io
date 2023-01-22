@@ -4,7 +4,7 @@
 /* global variables */
 :root {
   /* sizes */
-  --board-width: 500px;
+  --board-width: 450px;
   --pad: 10px;
 
   /* colors */
@@ -105,20 +105,18 @@ html,
 }
 
 ul {
-  background-color: var(--color-back);
-  background-color: yellow;
+/*  background-color: red;*/
   color: var(--color-fore);
+  font-size: 0.75em;
   margin: auto;
   padding: 0;
   text-align: center;
   max-width: var(--board-width);
+  aspect-ratio: 4.0;
   list-style-type: none;
-  -moz-column-count: 5;
-  -moz-column-gap: 2px;
-  -webkit-column-count: 5;
-  -webkit-column-gap: 2px;
-  column-count: 5;
-  column-gap: 2px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
 }
 
 #board {

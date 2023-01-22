@@ -23,7 +23,7 @@ setUpActions();
 /* ========================================================================== */
 // sets up the html
 function setUpView() {
-  const tileSize = 20;
+  const tileSize = 25;
 
   // draw the main letter
   let letter = document.createElement('div');
@@ -49,8 +49,8 @@ function setUpView() {
 
     // work out the position
     let theta = (i-1) * 2.0 * Math.PI / (wordWheel.keyWord.length-1);
-    let x = 50+30*Math.cos(theta) - tileSize/2;
-    let y = 50+30*Math.sin(theta) - tileSize/2;
+    let x = 50+35*Math.cos(theta) - tileSize/2;
+    let y = 50+35*Math.sin(theta) - tileSize/2;
     letter.style.width = tileSize+'%';
     letter.style.left = x+'%';
     letter.style.top = y+'%';
