@@ -14,7 +14,7 @@ const backButton = document.getElementById('back');
 const scoreBox = document.getElementById('score');
 const listBox = document.getElementById('list');
 
-fetchData();
+fetchData(Random.seed());
 updateColorScheme();
 setUpView();
 setUpActions();
@@ -208,6 +208,7 @@ function tapSubmit() {
   let len = guess.length;
   let word = guess.join('');
 
+  console.log(wordWheel + '(' + typeof wordWheel + ')');
   let status = wordWheel.checkGuess(word);
   flashStatus(status);
 
@@ -215,7 +216,7 @@ function tapSubmit() {
     let item = document.createElement('li');
     item.innerHTML = word;
     listBox.appendChild(item);
-    saveData();
+    saveData(Random.seed());
   }
 
   resetGuess();
@@ -258,7 +259,15 @@ function fetchData(seed) {
 
       req.onsuccess = (event) => {
         // overwrite wordWheel
-        wordWheel = event.target.result; // TODO: check this works
+        // wordWheel = event.target.result; // TODO: check this works
+        let res = event.target.result;
+        wordWheel.keyWord = res.keyWord;
+        wordWheel.letters = res.letters;
+        wordWheel.keyLetter = res.keyLetter;
+        wordWheel.wordList = res.wordList;
+        wordWheel.aim = res.aim;
+        wordWheel.guessList = res.guessList;
+        wordWheel.keyWordGuessed = res.keyWordGuessed;
       };
     };
 
@@ -287,7 +296,7 @@ function fetchData(seed) {
 }
 
 // fetch indexed data
-function saveData() {
+function saveData(seed) {
   // check if IndexedDB is supported
   if(window.indexedDB){
     var request = window.indexedDB.open('WORD_WHEEL_DB', seed);
@@ -310,7 +319,7 @@ function saveData() {
 
       req.onerror = (event) => {
         // if it doesn't exist just write
-        const requestUpdate = store.put(data);
+        const requestUpdate = store.put(wordWheel);
         requestUpdate.onerror = (event) => {
           console.error(`Database error [write]: ${event.target.errorCode}`);
         };
@@ -321,7 +330,7 @@ function saveData() {
 
       req.onsuccess = (event) => {
         // overwrite wordWheel
-        const requestUpdate = store.put(data);
+        const requestUpdate = store.put(wordWheel);
         requestUpdate.onerror = (event) => {
           console.error(`Database error [write]: ${event.target.errorCode}`);
         };
