@@ -48,6 +48,8 @@ html,
 .title {
   color: var(--color-fore);
   font-size: 3rem;
+  padding: 0;
+  margin: auto;
 }
 
 

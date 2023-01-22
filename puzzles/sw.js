@@ -2,11 +2,21 @@
 var cacheName = 'puzzles';
 
 /* ensure that this contains everything */
+// TODO: should probably glob to automatically update this list
 var filesToCache = [
   '/',
   '/index.html',
+  '/word-wheel.html',
   '/css/style.css',
-  '/js/main.js'
+  '/css/word-wheel.css',
+  '/js/main.js',
+  'en-gb-9.js',
+  'en-gb.js',
+  'main.js',
+  'Random.js',
+  'Trie.js',
+  'word-wheel-view.js',
+  'WordWheel.js'
 ];
 
 /* Start the service worker and cache all of the app's content */
