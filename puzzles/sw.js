@@ -10,13 +10,12 @@ var filesToCache = [
   '/css/style.css',
   '/css/word-wheel.css',
   '/js/main.js',
-  'en-gb-9.js',
-  'en-gb.js',
-  'main.js',
-  'Random.js',
-  'Trie.js',
-  'word-wheel-view.js',
-  'WordWheel.js'
+  '/js/en-gb-9.js',
+  '/js/en-gb.js',
+  '/js/Random.js',
+  '/js/Trie.js',
+  '/js/word-wheel-view.js',
+  '/js/WordWheel.js'
 ];
 
 /* Start the service worker and cache all of the app's content */
