@@ -1,94 +1,35 @@
 /* jshint esversion: 6 */
 
-var score = 0;
-var wordList = [];
+var wordWheel = new WordWheel();
 
-var usesKey = false; // does the current guess use the key letter?
 var hasClicked = []; // which letters have been clicked
 var guess = []; // records the guess
 var guessId = []; // records the guess ids
 
-var keyword = '';
-var keyletter = '';
-var letters = [];
-var totalWords = [];
-var aim = [10, 100, 1000, 10000];
-
 // elements
 const board = document.getElementById('board');
-const aimBox = document.getElementById('aim');
 const guessBox = document.getElementById('guess');
 const submitButton = document.getElementById('submit');
 const backButton = document.getElementById('back');
 const scoreBox = document.getElementById('score');
+const listBox = document.getElementById('list');
 
-// set everything up
-setupGame();
-setupActions();
+updateColorScheme();
+setUpView();
+setUpActions();
 
-
-// returns the day seed (just days since epoch)
-function daySeed() {
-  var now = new Date();
-  var day = Math.floor(now/8.64e7);
-  return day;
-}
-
-// shuffles an array using a seed
-function shuffle(array, seed) {
-  var m = array.length, t, i;
-
-  // While there remain elements to shuffle…
-  while (m) {
-
-    // Pick a remaining element…
-    i = Math.floor(random(seed) * m--);
-
-    // And swap it with the current element.
-    t = array[m];
-    array[m] = array[i];
-    array[i] = t;
-    ++seed;
-  }
-
-  return array;
-}
-
-// returns a (bad) seeded random number
-function random(seed) {
-  var x = Math.sin(seed++) * 10000;
-  return x - Math.floor(x);
-}
-
-// set up the game
-function setupGame() {
-  // reset the players progress
-  score = 0;
-  wordList = [];
-
-  // set up the game variables
-  let seed = daySeed();
-  keyword = en_gb_9[seed % en_gb_9.length];
-  letters = keyword.toUpperCase().split('');
-  shuffle(letters, seed);
-  keyletter = letters[0];
-  const N = letters.length;
-
-  // get total words
-  totalWords = subwords(letters, maxTrie, 0);
-  aim[0] = Math.floor(0.1*totalWords.length);
-  aim[1] = Math.floor(0.15*totalWords.length);
-  aim[2] = Math.floor(0.2*totalWords.length);
-  aim[3] = totalWords.length;
-
-  // draw everything
+/* ========================================================================== */
+/*   FUNCTIONS                                                                */
+/* ========================================================================== */
+// sets up the html
+function setUpView() {
   const tileSize = 20;
 
   // draw the main letter
   let letter = document.createElement('div');
   letter.classList.add('letter');
   letter.classList.add('keyLetter');
-  letter.innerHTML = keyletter;
+  letter.innerHTML = wordWheel.keyLetter;
   letter.id = 0;
   let x = 50 - tileSize/2;
   let y = 50 - tileSize/2;
@@ -96,19 +37,18 @@ function setupGame() {
   letter.style.left = x+'%';
   letter.style.top = y+'%';
   board.appendChild(letter);
-
   hasClicked.push(false);
 
   // draw the remaining letters
-  for (var i = 1; i < N; i++) {
+  for (var i = 1; i < wordWheel.keyWord.length; i++) {
     // create a letter div for each one
     let letter = document.createElement('div');
     letter.classList.add('letter');
-    letter.innerHTML = letters[i];
+    letter.innerHTML = wordWheel.letters[i];
     letter.id = i;
 
     // work out the position
-    let theta = (i-1) * 2.0 * Math.PI / (N-1);
+    let theta = (i-1) * 2.0 * Math.PI / (wordWheel.keyWord.length-1);
     let x = 50+30*Math.cos(theta) - tileSize/2;
     let y = 50+30*Math.sin(theta) - tileSize/2;
     letter.style.width = tileSize+'%';
@@ -120,12 +60,10 @@ function setupGame() {
     hasClicked.push(false);
   }
 
-  scoreBox.innerHTML = score;
   resetGuess();
-  updateColorScheme();
 }
 
-// update color scheme
+// update color scheme to match user scheme
 function updateColorScheme() {
   // TODO: use color codes for the colors
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -149,6 +87,72 @@ function updateColorScheme() {
   }
 }
 
+// updates the button colors
+function updateSelection() {
+  for (var i = 0; i < wordWheel.keyWord.length; i++) {
+    if (hasClicked[i]) {
+      document.getElementById(i).classList.remove('unselected');
+      document.getElementById(i).classList.add('selected');
+    } else {
+      document.getElementById(i).classList.remove('selected');
+      document.getElementById(i).classList.add('unselected');
+    }
+  }
+
+  guessBox.innerHTML = guess.join('');
+}
+
+// resets the guess
+function resetGuess() {
+  guess = [];
+  guessId = [];
+  for(var i = 0; i < wordWheel.keyWord.length; i++){
+    hasClicked[i] = false;
+  }
+
+  if (wordWheel.score < wordWheel.aim[0]) {
+    scoreBox.innerHTML = wordWheel.score + " words, (average: " + wordWheel.aim[0] + ")";
+  } else if (wordWheel.score < wordWheel.aim[1]) {
+    scoreBox.innerHTML = wordWheel.score + " words, (good: " + wordWheel.aim[1] + ")";
+  } else if (wordWheel.score < wordWheel.aim[2]) {
+    scoreBox.innerHTML = wordWheel.score + " words, (excellent: " + wordWheel.aim[2] + ")";
+  } else {
+    scoreBox.innerHTML = wordWheel.score + " words, (total: " + wordWheel.aim[3] + ")";
+  }
+
+  updateSelection();
+}
+
+// flash good, rep, bad status for a guess
+function flashStatus(status) {
+  let anim = 'anim-' + status + ' 0.5s linear 1';
+  for (var i in hasClicked) {
+    if (hasClicked[i]) {
+      document.getElementById(i).style.animation = anim;
+    }
+  }
+  setTimeout(function () {
+    for (var i in hasClicked) {
+      document.getElementById(i).style.animation = null;
+    }
+  }, 500);
+}
+
+// removes the last letter
+function backspace() {
+  // do nothing if the guess is empty
+  if (guess.length == 0) {
+    return;
+  }
+
+  // remove the last letter
+  let id = guessId.pop();
+  guess.pop();
+  hasClicked[id] = false;
+
+  updateSelection();
+}
+
 // what do do if a key tap is detected
 function keyTapped(event) {
   let keyCode = event.keyCode;
@@ -162,6 +166,7 @@ function keyTapped(event) {
     // ALPHABET UPPER CASE
   } else if (event.keyCode >= 97 && event.keyCode <= 122) {
     // ALPHABET LOWER CASE
+    // TODO: enable keyboard usage
   } else {
     // CONTROL KEYS
     // delete: 8
@@ -184,12 +189,7 @@ function tapDown(event) {
 
   if (isLetter) {
     let id = target.id;
-    let isKeyLetter = target.classList.contains('keyLetter');
     let letter = target.innerHTML;
-
-    if (isKeyLetter) {
-      usesKey = true;
-    }
 
     // add letter if it hasn't been used already
     if (!hasClicked[id]) {
@@ -202,109 +202,25 @@ function tapDown(event) {
   }
 }
 
-// removes the last letter
-function backspace() {
-  // do nothing if the guess is empty
-  if (guess.length == 0) {
-    return;
-  }
-
-  // remove the last letter
-  let id = guessId.pop();
-  guess.pop();
-  hasClicked[id] = false;
-
-  updateSelection();
-}
-
-// updates the button colors
-function updateSelection() {
-  for (var i = 0; i < keyword.length; i++) {
-    if (hasClicked[i]) {
-      document.getElementById(i).classList.remove('unselected');
-      document.getElementById(i).classList.add('selected');
-    } else {
-      document.getElementById(i).classList.remove('selected');
-      document.getElementById(i).classList.add('unselected');
-    }
-  }
-
-  guessBox.innerHTML = guess.join('');
-}
-
-// resets the guess
-function resetGuess() {
-  usesKey = false;
-  guess = [];
-  guessId = [];
-  for(var i = 0; i < keyword.length; i++){
-    hasClicked[i] = false;
-  }
-
-  if (score < aim[0]) {
-    aimBox.innerHTML = "average: " + aim[0];
-  } else if (score < aim[1]) {
-    aimBox.innerHTML = "good: " + aim[1];
-  } else if (score < aim[2]) {
-    aimBox.innerHTML = "excellent: " + aim[2];
-  } else {
-    aimBox.innerHTML = "total: " + aim[3];
-  }
-
-  updateSelection();
-}
-
-// flash good, rep, bad status for a guess
-function flashStatus(status) {
-  let anim = 'anim-' + status + ' 0.5s linear 1';
-  for (var i in hasClicked) {
-    if (hasClicked[i]) {
-      document.getElementById(i).style.animation = anim;
-    }
-  }
-  setTimeout(function () {
-    for (var i in hasClicked) {
-      document.getElementById(i).style.animation = null;
-    }
-  }, 500);
-}
-
 // submit a guess
 function tapSubmit() {
   let len = guess.length;
   let word = guess.join('');
 
-  // no letters must be wrong
-  if (!usesKey) {
-    flashStatus('bad');
-    resetGuess();
-    return;
-  }
+  let status = wordWheel.checkGuess(word);
+  flashStatus(status);
 
-  // has it been guessed already?
-  for(var i = 0, length1 = wordList.length; i < length1; i++){
-    if (word === wordList[i]) {
-      flashStatus('rep');
-      resetGuess();
-      return;
-    }
-  }
-
-  // check that the guess is actually a word with 3 or more letters
-  if (isValid(word, 3)) {
-    wordList.push(word);
-    score = score + 1;
-    scoreBox.innerHTML = score;
-    flashStatus('good');
-  } else {
-    flashStatus('bad');
+  if (status == 'good') {
+    let item = document.createElement('li');
+    item.innerHTML = word;
+    listBox.appendChild(item);
   }
 
   resetGuess();
 }
 
 // set up interactions with the game internals
-function setupActions() {
+function setUpActions() {
   // TODO: be different depending on computer vs touchscreen
   document.addEventListener('keydown', keyTapped);
   document.addEventListener('click', tapDown);

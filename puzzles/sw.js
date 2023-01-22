@@ -1,5 +1,5 @@
 /* update the name of the cache */
-var cacheName = 'template';
+var cacheName = 'puzzles';
 
 /* ensure that this contains everything */
 var filesToCache = [

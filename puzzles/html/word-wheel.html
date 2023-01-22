@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>word wheel</title>
+  <link rel="stylesheet" href="../css/word-wheel.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="../images/puzzles-152.png">
+  <meta name="theme-color" content="white"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="word wheel">
+  <meta name="msapplication-TileImage" content="../images/puzzles-144.png">
+  <meta name="msapplication-TileColor" content="#FFFFFF">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="fullscreen">
+  <div class="container">
+    <!-- title and navigation -->
+    <h1 class="title">WORD WHEEL</h1>
+    <div class="container">
+      <a href="../index.html">puzzle index</a>
+    </div>
+
+    <!-- score and aim -->
+    <div id="score">0 words, (average 0)</div>
+
+    <!-- guess list -->
+    <div>
+      <ul id="list"></ul>
+    </div>
+
+    <!-- controls -->
+    <div id="controls">
+      <button id="submit">check</button>
+      <div id="guess"></div>
+      <button id="back">back</button>
+    </div>
+
+    <!-- board -->
+    <div id="board"></div>
+  </div>
+
+  <!-- javascript sources -->
+  <script src="../js/Trie.js"></script>
+  <script src="../js/Random.js"></script>
+  <script src="../js/en-gb.js"></script>
+  <script src="../js/en-gb-9.js"></script>
+  <script src="../js/WordWheel.js"></script>
+  <script src="../js/word-wheel-view.js"></script>
+</body>
+
+</html>

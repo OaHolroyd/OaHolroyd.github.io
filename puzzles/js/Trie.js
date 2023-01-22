@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 // Trie.js - super simple JS implementation
 // https://en.wikipedia.org/wiki/Trie
-// TODO: rewrite
+// TODO: rewrite as class
 // -----------------------------------------
 
 // we start with the TrieNode
@@ -136,20 +136,3 @@ function findAllWords(node, arr) {
     findAllWords(node.children[child], arr);
   }
 }
-
-// -----------------------------------------
-
-// // instantiate our trie
-// var trie = new Trie();
-
-// // insert few values
-// trie.insert("hello");
-// trie.insert("helium");
-
-// // check contains method
-// console.log(trie.contains("helium"));  // true
-// console.log(trie.contains("kickass")); // false
-
-// // check find method
-// console.log(trie.find("hel"));  // [ 'helium', 'hello' ]
-// console.log(trie.find("hell")); // [ 'hello' ]
