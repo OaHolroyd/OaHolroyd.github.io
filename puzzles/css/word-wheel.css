@@ -24,6 +24,8 @@
 /* body */
 body {
   font-family: sans-serif;
+  height: 100%;
+  overflow-y: hidden;
 }
 
 /* ensures content area fills the entire browser window */
