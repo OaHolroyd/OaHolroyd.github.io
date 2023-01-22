@@ -23,7 +23,7 @@ self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
       const stack = [];
-      assets.forEach(file => stack.push(
+      filesToCache.forEach(file => stack.push(
           cache.add(file).catch(_=>console.error(`can't load ${file} to cache`))
       ));
       return Promise.all(stack);
