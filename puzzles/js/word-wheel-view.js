@@ -68,6 +68,7 @@ function updateColorScheme() {
   // TODO: use color codes for the colors
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     // dark mode
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", 'black');
     document.documentElement.style.setProperty('--color-back', 'black');
     document.documentElement.style.setProperty('--color-fore', 'white');
     document.documentElement.style.setProperty('--color-min', 'darkgrey');
@@ -77,6 +78,7 @@ function updateColorScheme() {
     document.documentElement.style.setProperty('--color-tintbad', 'lightred');
   } else {
     // light mode
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", 'white');
     document.documentElement.style.setProperty('--color-back', 'white');
     document.documentElement.style.setProperty('--color-fore', 'black');
     document.documentElement.style.setProperty('--color-min', 'lightgrey');
@@ -157,8 +159,6 @@ function backspace() {
 function keyTapped(event) {
   let keyCode = event.keyCode;
   let key = String.fromCharCode(keyCode); // note that this is uppercase
-
-  console.log(key + ' ' + '(' + keyCode + ') was pressed');
 
   if (event.keyCode >= 48 && event.keyCode <= 57) {
     // NUMBER

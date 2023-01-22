@@ -33,7 +33,6 @@ class WordWheel {
                 Math.floor(0.25 * nwords),
                 Math.floor(0.30 * nwords),
                 nwords];
-    console.log(this.aim);
 
     // player data
     this.guessList = [];
@@ -55,20 +54,17 @@ class WordWheel {
 
     // word is too short
     if (lWord.length < 3) {
-      console.log('too short');
       return 'bad';
     }
 
     // word doesn't contain the key letter
     if (!lWord.includes(this.keyLetter.toLowerCase())) {
-      console.log('doesn\'t include a '+ this.keyLetter);
       return 'bad';
     }
 
     // guessed already
     for(var i = 0, N = this.guessList.length; i < N; i++){
       if (lWord === this.guessList[i]) {
-        console.log('repeat');
         return 'rep';
       }
     }
@@ -81,10 +77,8 @@ class WordWheel {
       if (lWord.length == 9) {
         this.keyWordGuessed = true;
       }
-      console.log('good');
       return 'good';
     }
-    console.log('fallthrough');
     return 'bad';
   }
 
