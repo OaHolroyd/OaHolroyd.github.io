@@ -116,13 +116,13 @@ function resetGuess() {
   }
 
   if (wordWheel.score < wordWheel.aim[0]) {
-    scoreBox.innerHTML = wordWheel.score + " words, (average: " + wordWheel.aim[0] + ")";
+    scoreBox.innerHTML = wordWheel.score + " words, (average " + wordWheel.aim[0] + ")";
   } else if (wordWheel.score < wordWheel.aim[1]) {
-    scoreBox.innerHTML = wordWheel.score + " words, (good: " + wordWheel.aim[1] + ")";
+    scoreBox.innerHTML = wordWheel.score + " words, (good " + wordWheel.aim[1] + ")";
   } else if (wordWheel.score < wordWheel.aim[2]) {
-    scoreBox.innerHTML = wordWheel.score + " words, (excellent: " + wordWheel.aim[2] + ")";
+    scoreBox.innerHTML = wordWheel.score + " words, (excellent " + wordWheel.aim[2] + ")";
   } else {
-    scoreBox.innerHTML = wordWheel.score + " words, (total: " + wordWheel.aim[3] + ")";
+    scoreBox.innerHTML = wordWheel.score + " words, (total " + wordWheel.aim[3] + ")";
   }
 
   updateSelection();
@@ -188,20 +188,26 @@ function keyTapped(event) {
 // what to do if the game is clicked/tapped
 function tapDown(event) {
   let target = event.target;
-  let isLetter = target.classList.contains('letter');
+  console.log(event);
+  console.log(target);
 
-  if (isLetter) {
+  if (target.classList.contains('letter')) {
     let id = target.id;
     let letter = target.innerHTML;
 
-    // add letter if it hasn't been used already
     if (!hasClicked[id]) {
+      // add letter if it hasn't been used already
       hasClicked[id] = true;
       guess.push(letter);
       guessId.push(id);
+    } else if (id == guessId[guessId.length-1]) {
+      // remove selected if it was the previous one
+      backspace();
     }
 
     updateSelection();
+  } else if (target.id == 'board') {
+    resetGuess();
   }
 }
 
