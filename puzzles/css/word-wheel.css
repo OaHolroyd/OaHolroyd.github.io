@@ -147,6 +147,7 @@ ul {
   border-radius: 500%;
   border: 2px solid var(--color-fore);
   color: var(--color-fore);
+  touch-action: manipulation;
 }
 
 .keyLetter {
