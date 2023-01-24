@@ -46,10 +46,54 @@ function setUpActions() {
 function setUpLinks() {
   let puzzleList = document.getElementById('puzzleList');
 
+  let seed = Random.seed();
+
   for (puzzle of puzzles) {
     // get names
     let displayName = puzzle;
     let fileName = puzzle.replace(/ /g, "-").toLowerCase();
+
+    // fetch the stats and asynchronously update
+    let statsBox = document.createElement('div');
+    statsBox.classList.add('stats');
+
+    let completed = document.createElement('div');
+    completed.classList.add('completed');
+
+    let streakBox = document.createElement('div');
+    streakBox.classList.add('streakBox');
+    let streakText = document.createElement('div');
+    streakText.classList.add('infoText');
+    streakText.innerHTML = "streak";
+    let streak = document.createElement('div');
+    streak.classList.add('streak');
+    streakBox.appendChild(streak);
+    streakBox.appendChild(streakText);
+
+    let totalBox = document.createElement('div');
+    totalBox.classList.add('totalBox');
+    let totalText = document.createElement('div');
+    totalText.classList.add('infoText');
+    totalText.innerHTML = "total";
+    let total = document.createElement('div');
+    total.classList.add('total');
+    totalBox.appendChild(total);
+    totalBox.appendChild(totalText);
+
+    statsBox.appendChild(completed);
+    statsBox.appendChild(streakBox);
+    statsBox.appendChild(totalBox);
+
+    DataBase.fetchStats(fileName, (stats) => {
+      if (stats.lastCompletion == seed) {
+        completed.classList.add('yes');
+      } else {
+        completed.classList.add('no');
+      }
+
+      streak.innerHTML = stats.streak;
+      total.innerHTML = stats.total;
+    });
 
     // create elements
     let box = document.createElement('div');
@@ -74,19 +118,49 @@ function setUpLinks() {
     // assemble
     imgBox.appendChild(img);
     imgBox.appendChild(desc);
+    imgBox.appendChild(statsBox);
     link.appendChild(imgBox);
     box.appendChild(link);
     puzzleList.appendChild(box);
+
   }
 
   // final "coming soon" box
   let displayName = 'coming soon';
   let fileName = 'puzzles-512';
 
+  let statsBox = document.createElement('div');
+  statsBox.classList.add('stats');
+  let completed = document.createElement('div');
+  completed.classList.add('completed');
+  let streakBox = document.createElement('div');
+  streakBox.classList.add('streakBox');
+  let streakText = document.createElement('div');
+  streakText.classList.add('infoText');
+  streakText.innerHTML = "streak";
+  let streak = document.createElement('div');
+  streak.classList.add('streak');
+  streakBox.appendChild(streak);
+  streakBox.appendChild(streakText);
+  let totalBox = document.createElement('div');
+  totalBox.classList.add('totalBox');
+  let totalText = document.createElement('div');
+  totalText.classList.add('infoText');
+  totalText.innerHTML = "total";
+  let total = document.createElement('div');
+  total.classList.add('total');
+  totalBox.appendChild(total);
+  totalBox.appendChild(totalText);
+  statsBox.appendChild(completed);
+  statsBox.appendChild(streakBox);
+  statsBox.appendChild(totalBox);
+  streak.innerHTML = 0;
+  total.innerHTML = 0;
+
   let box = document.createElement('div');
   box.classList.add('responsive');
   let link = document.createElement('a');
-  link.href = fileName + '.html';
+  link.href = 'javascript:;';
   let imgBox = document.createElement('div');
   imgBox.classList.add('gallery');
   let img = document.createElement('img');
@@ -99,6 +173,7 @@ function setUpLinks() {
 
   imgBox.appendChild(img);
   imgBox.appendChild(desc);
+  imgBox.appendChild(statsBox);
   link.appendChild(imgBox);
   box.appendChild(link);
   puzzleList.appendChild(box);

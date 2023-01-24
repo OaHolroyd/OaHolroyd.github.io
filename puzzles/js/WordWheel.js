@@ -48,6 +48,11 @@ class WordWheel {
     return this.guessList.length;
   }
 
+  // whether the game has been completed
+  get isCompleted() {
+    return (this.score > this.aim[2]) && (this.keyWordGuessed);
+  }
+
 
   /* ================== */
   /*   PUBLIC METHODS   */

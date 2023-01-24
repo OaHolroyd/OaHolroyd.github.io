@@ -196,8 +196,6 @@ function keyTapped(event) {
 // what to do if the game is clicked/tapped
 function tapDown(event) {
   let target = event.target;
-  console.log(event);
-  console.log(target);
 
   if (target.classList.contains('letter')) {
     let id = target.id;
@@ -224,7 +222,6 @@ function tapSubmit() {
   let len = guess.length;
   let word = guess.join('');
 
-  console.log(wordWheel + '(' + typeof wordWheel + ')');
   let status = wordWheel.checkGuess(word);
   flashStatus(status);
 

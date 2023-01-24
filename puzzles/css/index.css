@@ -44,6 +44,11 @@ html,
   font-size: 3rem;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 
 /* bunch of styles for displaying gallery of puzzles */
 div.gallery {
@@ -91,4 +96,58 @@ div.desc {
   content: "";
   display: table;
   clear: both;
+}
+
+.stats {
+  margin: auto;
+  background-color: var(--color-back);
+  max-width: calc(var(--board-width) - 2*var(--pad));
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: var(--pad);
+}
+
+.completed {
+  color: var(--color-fore);
+  background-color: gray;
+  height: 50%;
+  aspect-ratio: 1.0;
+  border-radius: 50%;
+}
+
+.completed.yes {
+  background-color: green;
+}
+
+.completed.no {
+  background-color: red;
+}
+
+.totalBox {
+  color: var(--color-fore);
+  width: 40%;
+}
+
+.streakBox {
+  color: var(--color-fore);
+  width: 40%;
+}
+
+.infoText {
+  color: var(--color-mid);
+  width: 100%;
+  font-size: 0.5em;
+}
+
+.total {
+  color: var(--color-fore);
+  width: 100%;
+}
+
+.streak {
+  color: var(--color-fore);
+  width: 100%;
 }
