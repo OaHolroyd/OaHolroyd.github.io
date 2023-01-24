@@ -50,7 +50,7 @@ class WordWheel {
 
   // whether the game has been completed
   get isCompleted() {
-    return (this.score > this.aim[2]) && (this.keyWordGuessed);
+    return (this.score >= this.aim[2]) && (this.keyWordGuessed);
   }
 
 
