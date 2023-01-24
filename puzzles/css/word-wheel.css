@@ -55,6 +55,7 @@ html,
 }
 
 a {
+  border-radius: 15px;
   border: 1px solid var(--color-mid);
   padding: 2px;
   text-decoration: none;
@@ -84,6 +85,7 @@ a {
 }
 
 #submit {
+  border-radius: 15px;
   border: 1px solid var(--color-fore);
   color: var(--color-fore);
   background-color: lightgreen;
@@ -95,6 +97,7 @@ a {
 }
 
 #back {
+  border-radius: 15px;
   border: 1px solid var(--color-fore);
   color: var(--color-fore);
   background-color: red;
@@ -148,6 +151,7 @@ ul {
   border: 2px solid var(--color-fore);
   color: var(--color-fore);
   touch-action: manipulation;
+  font-size: 2em;
 }
 
 .keyLetter {
