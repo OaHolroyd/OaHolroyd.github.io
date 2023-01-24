@@ -2,17 +2,21 @@
 
 class WordWheel {
   constructor() {
-    // random seed
-    let seed = Random.seed();
+    // set id (for storage)
+    this.id = 'word-wheel';
+
+    // daily seed
+    this.seed = Random.seed(); // (for storage)
+    let rseed = this.seed;
 
     // game setup
-    this.keyWord = en_gb_9[Math.floor(Random.rand(seed)*en_gb_9.length)];
+    this.keyWord = en_gb_9[Math.floor(Random.rand(rseed)*en_gb_9.length)];
 
     // loop through until there are enough words
     const tol = 50;
     var nwords;
     this.letters = this.keyWord.toUpperCase().split('');
-    Random.shuffle(this.letters, seed);
+    Random.shuffle(this.letters, rseed);
 
     for(var i = 0; i < this.keyWord.length; i++){
       // circshift

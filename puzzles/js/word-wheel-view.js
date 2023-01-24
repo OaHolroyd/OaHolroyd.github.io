@@ -240,169 +240,168 @@ function setUpActions() {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
 }
 
-// fetch indexed data
-function fetchData(seed) {
-  // check if IndexedDB is supported
-  if (window.indexedDB) {
-    var request = window.indexedDB.open('WORD_WHEEL_DB', seed);
-    var db;
 
-    request.onerror = function(event) {
-      // this is called if the database cannot be found
-    };
+// TODO: move the database interaction to another file
 
-    request.onsuccess = function(event) {
-      // this is called if the database with the correct version is opened
-      db = event.target.result; // save database in db variable
+// gets the data from the IndexedDB
+function fetchData() {
+  // ensure that IndexedDB is supported
+  if (!window.indexedDB) {
+    console.error('IndexedDB not supported.');
+    return;
+  }
 
-      // read the data from the database
-      var store = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
-      var req = store.get(wordWheel.keyWord);
+  // get the database
+  const currentVersion = 1;
+  let openRequest = window.indexedDB.open('PUZZLES_DB', currentVersion);
 
-      req.onerror = (event) => {
-        // do nothing if it doesn't exist
-      };
+  // this is called if the database cannot be opened
+  openRequest.onerror = (openEvent) => {
+    console.error(`Database error [open]: ${openEvent.target.errorCode}`);
+    // TODO: suggest clearing the cache
+  };
 
-      req.onsuccess = (event) => {
-        // overwrite wordWheel
-        // wordWheel = event.target.result; // TODO: check this works
-        let res = event.target.result;
-        wordWheel.keyWord = res.keyWord;
-        wordWheel.letters = res.letters;
-        wordWheel.keyLetter = res.keyLetter;
-        wordWheel.wordList = res.wordList;
-        wordWheel.aim = res.aim;
-        wordWheel.guessList = res.guessList;
-        wordWheel.keyWordGuessed = res.keyWordGuessed;
+  // this is called if the database is being created or updated
+  openRequest.onupgradeneeded = (openEvent) => {
+    console.log('upgrading database [open]');
+    let db = openRequest.result;
 
-        for (var i in wordWheel.guessList) {
-          let item = document.createElement('li');
-          item.innerHTML = wordWheel.guessList[i];
-          listBox.appendChild(item);
+    // if the database doesn't exist, create it
+    if (openEvent.oldVersion == 0) {
+      console.log(`creating database ${currentVersion} [open]`);
+
+      // create object stores for puzzles and stats
+      db.createObjectStore('puzzles', {keyPath: 'id'});
+      db.createObjectStore('stats', {keyPath: 'id'});
+    }
+
+    // if the database does exist, we shoudl check it is set up correctly
+    else {
+      console.log(`upgrading database from ${openEvent.oldVersion} to ${currentVersion} [open]`);
+
+      // create the puzzles store if required
+      if (!db.objectStoreNames.contains('puzzles')) {
+        db.createObjectStore('puzzles', {keyPath: 'id'});
+      }
+
+      // create the stats store if required
+      if (!db.objectStoreNames.contains('stats')) {
+        db.createObjectStore('stats', {keyPath: 'id'});
+      }
+    }
+
+    // delete everything else
+    for (name of db.objectStoreNames) {
+      if (['puzzles', 'stats'].indexOf(name) < 0) {
+        console.log(`deleting ObjectStore ${name} [open]`);
+        db.deleteObjectStore(name);
+      }
+    }
+  };
+
+  // this is called if the database has been opened
+  openRequest.onsuccess = (openEvent) => {
+    console.log('opening database [open]');
+    let db = openRequest.result;
+
+    // create a transaction, get the puzzle ObjectStore and request the puzzle
+    let transaction = db.transaction('puzzles', 'readonly');
+    let puzzles = transaction.objectStore('puzzles');
+    let puzzleRequest = puzzles.get('word-wheel');
+
+    puzzleRequest.onsuccess = () => {
+      let result = puzzleRequest.result;
+      if (result !== undefined) {
+        console.log('puzzle found');
+
+        // only overwrite if the day matches
+        if (puzzleRequest.result['seed'] == wordWheel.seed) {
+          wordWheel.keyWord = result.keyWord;
+          wordWheel.letters = result.letters;
+          wordWheel.keyLetter = result.keyLetter;
+          wordWheel.wordList = result.wordList;
+          wordWheel.aim = result.aim;
+          wordWheel.guessList = result.guessList;
+          wordWheel.keyWordGuessed = result.keyWordGuessed;
+
+          // update the screen
+          for (let i in wordWheel.guessList) {
+            let item = document.createElement('li');
+            item.innerHTML = wordWheel.guessList[i];
+            listBox.appendChild(item);
+          }
+          resetGuess();
         }
-        resetGuess();
-      };
-    };
-
-    request.onupgradeneeded = function(event) {
-      // this is called if the database has either just been created, or has
-      // been upgraded from a previous version
-      db = event.target.result;
-
-      // create object store if required
-      if (event.oldVersion < 1000) {
-        // create object store to store wordWheel data
-        var store = db.createObjectStore('wordWheel', {keyPath: 'keyWord'});
-
-        // create index to search by keyWord
-        // TODO: is this required?
-        store.createIndex('keyWord', 'keyWord', { unique: false }); // TODO: or true?
-
-        // add data once objectStore creation is finished
-        store.transaction.oncomplete = (event) => {
-          // store values in the newly created objectStore
-          const wordWheelObjectStore = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
-          wordWheelObjectStore.add(wordWheel);
-        };
-      } else {
-        // overwrite data from wordWheel to save progress
-        // read the data from the database
-        var store = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
-        var req = store.get(wordWheel.keyWord);
-
-        req.onerror = (event) => {
-          // if it doesn't exist just write
-          const requestUpdate = store.put(wordWheel);
-          requestUpdate.onerror = (event) => {
-            console.error(`Database error [write]: ${event.target.errorCode}`);
-          };
-          requestUpdate.onsuccess = (event) => {
-            // data has been successfully updated
-          };
-        };
-
-        req.onsuccess = (event) => {
-          // overwrite wordWheel
-          const requestUpdate = store.put(wordWheel);
-          requestUpdate.onerror = (event) => {
-            console.error(`Database error [write]: ${event.target.errorCode}`);
-          };
-          requestUpdate.onsuccess = (event) => {
-            // data has been successfully updated
-          };
-        };
       }
     };
-  } else {
-    console.error('[fetch] IndexedDB is not supported');
-  }
+  };
 }
 
-// fetch indexed data
-function saveData(seed) {
-  // check if IndexedDB is supported
-  if(window.indexedDB){
-    var request = window.indexedDB.open('WORD_WHEEL_DB', seed);
-    var db;
-
-    request.onerror = function(event) {
-      // this is called if the database cannot be found
-      console.error(`Database error [open]: ${event.target.errorCode}`);
-    };
-
-    request.onsuccess = function(event) {
-      // this is called if the database with the correct version is opened
-      console.log('[onsuccess]', request.result);
-      db = event.target.result; // save database in db variable
-
-      // overwrite data from wordWheel to save progress
-      // read the data from the database
-      var store = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
-      var req = store.get(wordWheel.keyWord);
-
-      req.onerror = (event) => {
-        // if it doesn't exist just write
-        const requestUpdate = store.put(wordWheel);
-        requestUpdate.onerror = (event) => {
-          console.error(`Database error [write]: ${event.target.errorCode}`);
-        };
-        requestUpdate.onsuccess = (event) => {
-          // data has been successfully updated
-        };
-      };
-
-      req.onsuccess = (event) => {
-        // overwrite wordWheel
-        const requestUpdate = store.put(wordWheel);
-        requestUpdate.onerror = (event) => {
-          console.error(`Database error [write]: ${event.target.errorCode}`);
-        };
-        requestUpdate.onsuccess = (event) => {
-          // data has been successfully updated
-        };
-      };
-    };
-
-    request.onupgradeneeded = function(event) {
-      // this is called if the database has either just been created, or has
-      // been upgraded from a previous version
-      db = event.target.result;
-
-      // create object store to store wordWheel data
-      var store = db.createObjectStore('wordWheel', {keyPath: 'keyWord'});
-
-      // create index to search by keyWord
-      // TODO: is this required?
-      store.createIndex('keyWord', 'keyWord', { unique: false }); // TODO: or true?
-
-      // add data once objectStore creation is finished
-      store.transaction.oncomplete = (event) => {
-        // store values in the newly created objectStore
-        const wordWheelObjectStore = db.transaction('wordWheel', 'readwrite').objectStore('wordWheel');
-        wordWheelObjectStore.add(wordWheel);
-      };
-    };
-  } else {
-    console.error('[fetch] IndexedDB is not supported');
+// stores the data in the IndexedDB
+// TODO: lots of this is repeated from fetchData
+function saveData() {
+  // ensure that IndexedDB is supported
+  if (!window.indexedDB) {
+    console.error('IndexedDB not supported.');
+    return;
   }
+
+  // get the database
+  const currentVersion = 1;
+  let openRequest = window.indexedDB.open('PUZZLES_DB', currentVersion);
+
+  // this is called if the database cannot be opened
+  openRequest.onerror = (openEvent) => {
+    console.error(`Database error [open]: ${openEvent.target.errorCode}`);
+    // TODO: suggest clearing the cache
+  };
+
+  // this is called if the database is being created or updated
+  openRequest.onupgradeneeded = (openEvent) => {
+    console.log('upgrading database [open]');
+    let db = openRequest.result;
+
+    // if the database doesn't exist, create it
+    if (openEvent.oldVersion == 0) {
+      console.log(`creating database ${currentVersion} [open]`);
+
+      // create object stores for puzzles and stats
+      db.createObjectStore('puzzles', {keyPath: 'id'});
+      db.createObjectStore('stats', {keyPath: 'id'});
+    }
+
+    // if the database does exist, we shoudl check it is set up correctly
+    else {
+      console.log(`upgrading database from ${openEvent.oldVersion} to ${currentVersion} [open]`);
+
+      // create the puzzles store if required
+      if (!db.objectStoreNames.contains('puzzles')) {
+        db.createObjectStore('puzzles', {keyPath: 'id'});
+      }
+
+      // create the stats store if required
+      if (!db.objectStoreNames.contains('stats')) {
+        db.createObjectStore('stats', {keyPath: 'id'});
+      }
+    }
+
+    // delete everything else
+    for (name of db.objectStoreNames) {
+      if (['puzzles', 'stats'].indexOf(name) < 0) {
+        console.log(`deleting ObjectStore ${name} [open]`);
+        db.deleteObjectStore(name);
+      }
+    }
+  };
+
+  // this is called if the database has been opened
+  openRequest.onsuccess = (openEvent) => {
+    console.log('opening database [open]');
+    let db = openRequest.result;
+
+    // create a transaction, get the puzzle ObjectStore and put the puzzle
+    let transaction = db.transaction('puzzles', 'readwrite');
+    let puzzles = transaction.objectStore('puzzles');
+    let puzzleRequest = puzzles.put(wordWheel);
+  };
 }
