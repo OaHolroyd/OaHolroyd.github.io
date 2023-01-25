@@ -87,7 +87,6 @@ class DataBase {
     // this is called if the database has been opened
     openRequest.onsuccess = (openEvent) => {
       console.log('opening database');
-      console.log(game);
       let db = openRequest.result;
 
       // create a transaction, get the puzzle ObjectStore and put the puzzle
@@ -106,7 +105,6 @@ class DataBase {
             let result = statsRequest.result;
             // check that the stats exist
             if (result !== undefined) {
-              result.lastCompletion = game.seed;
               if (result.lastCompletion == game.seed-1) {
                 result.streak++;
                 result.total++;
@@ -114,6 +112,7 @@ class DataBase {
                 result.streak = 1;
                 result.total++;
               }
+              result.lastCompletion = game.seed;
             } else {
               // create the stats if they don't exist
               // TODO: should be function elsewhere
