@@ -24,6 +24,7 @@ DataBase.fetchGame(wordWheel, () => {
     listBox.appendChild(item);
   }
   resetGuess();
+  console.log(wordWheel.wordList);
 });
 updateColorScheme();
 setUpActions();

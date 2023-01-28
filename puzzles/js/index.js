@@ -106,7 +106,7 @@ function setUpLinks() {
     imgBox.classList.add('gallery');
 
     let img = document.createElement('img');
-    img.src = 'images/' + fileName + '.png'; // TODO: what if this doesn't exist?
+    img.src = 'images/' + fileName + '.svg'; // TODO: what if this doesn't exist?
     img.alt = fileName;
     img.onerror = "this.onerror=null;this.src='images/puzzles-512.png';";
     // TODO: also set width and height?
