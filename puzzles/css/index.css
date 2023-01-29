@@ -19,6 +19,7 @@
 
 body {
   font-family: sans-serif;
+  overflow-x: hidden;
 }
 
 /* Make content area fill the entire browser window */
