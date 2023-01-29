@@ -25,6 +25,7 @@ function updateColorScheme() {
     document.documentElement.style.setProperty('--color-max', 'lightgrey');
     document.documentElement.style.setProperty('--color-tintgood', 'lightgreen');
     document.documentElement.style.setProperty('--color-tintbad', 'lightred');
+    document.documentElement.style.setProperty('--inv', '1.0');
   } else {
     // light mode
     document.querySelector('meta[name="theme-color"]').setAttribute("content", 'white');
@@ -35,6 +36,7 @@ function updateColorScheme() {
     document.documentElement.style.setProperty('--color-max', 'darkgrey');
     document.documentElement.style.setProperty('--color-tintgood', 'darkgreen');
     document.documentElement.style.setProperty('--color-tintbad', 'darkred');
+    document.documentElement.style.setProperty('--inv', '0.0');
   }
 }
 

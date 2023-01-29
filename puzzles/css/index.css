@@ -15,6 +15,8 @@
   --color-bad: red;
   --color-tintbad: darkred;
   --color-rep: yellow;
+
+  --inv: 0.0;
 }
 
 body {
@@ -152,4 +154,10 @@ div.desc {
 .streak {
   color: var(--color-fore);
   width: 100%;
+}
+
+img {
+  background-color: white;
+  -webkit-filter: invert(var(--inv));
+          filter: invert(var(--inv));
 }
