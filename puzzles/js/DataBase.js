@@ -46,12 +46,12 @@ class DataBase {
           console.log('puzzle found');
 
           // only overwrite if the day matches
-          if (result['seed'] == game.seed) {
+          // if (result['seed'] == game.seed) {
             // overwrite all of the properties of the game
-            for (let property of Object.keys(game)) {
-              game[property] = result[property];
-            }
+          for (let property of Object.keys(game)) {
+            game[property] = result[property];
           }
+          // }
         }
         oncompletion();
       };

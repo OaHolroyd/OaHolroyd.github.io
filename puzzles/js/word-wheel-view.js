@@ -17,6 +17,26 @@ var letterBox = [];
 
 setUpView();
 DataBase.fetchGame(wordWheel, () => {
+  let todayWheel = new WordWheel();
+
+  if (wordWheel.seed == todayWheel.seed) {
+    // loaded today's wheel, do nothing
+  } else if (wordWheel.seed == todayWheel.seed-1) {
+    // loaded yesterday's wheel, display missing words
+    let missing = '';
+
+    for (let guess of wordWheel.wordList) {
+      if (!wordWheel.guessList.contains(guess)) {
+        missing += ' ' + guess;
+      }
+    }
+
+    alert(missing);
+  } else {
+    // loaded old wheel, overwrite
+    wordWheel = todayWheel;
+  }
+
   // update the screen
   for (let i in wordWheel.guessList) {
     let item = document.createElement('li');
