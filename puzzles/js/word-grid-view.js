@@ -16,29 +16,6 @@ var letterGrid = [];
 
 setUpView();
 DataBase.fetchGame(wordGrid, () => {
-  let todayGrid = new WordGrid();
-
-  if (wordGrid.seed == todayGrid.seed) {
-    // loaded today's grid, do nothing
-  } else if (wordGrid.seed == todayGrid.seed-1) {
-    // loaded yesterday's grid, display missing words
-    let missing = '';
-
-    for (let guess of wordGrid.wordList) {
-      if (!wordGrid.guessList.contains(guess)) {
-        missing += ' ' + guess;
-      }
-    }
-
-    alert(missing);
-
-    // then overwrite
-    wordGrid = todayGrid;
-  } else {
-    // loaded old grid, overwrite
-    wordGrid = todayGrid;
-  }
-
   // update the screen
   for (let i in wordGrid.guessList) {
     let item = document.createElement('li');
@@ -46,6 +23,7 @@ DataBase.fetchGame(wordGrid, () => {
     listBox.appendChild(item);
   }
   resetGuess();
+  console.log(wordGrid.wordList);
 });
 updateColorScheme();
 setUpActions();
